@@ -6,11 +6,11 @@ on:
       FOX_BRANCH:
         description: 'OrangeFox Manifest Branch'
         required: true
-        default: 'fox_12.1'
+        default: '12.1'
         type: choice
         options:
-          - 'fox_12.1'
-          - 'fox_11.0'
+          - '12.1'
+          - '11.0'
   push:
     paths:
       - '.github/workflows/orangefox.yml'
@@ -48,24 +48,23 @@ jobs:
           chmod a+x ~/bin/repo
           sudo ln -sf ~/bin/repo /usr/bin/repo
 
-      - name: Initialize OrangeFox Manifest
+      - name: Initialize OrangeFox Sync
         run: |
-          mkdir -p fox
-          cd fox
           git config --global user.name "Builder"
           git config --global user.email "builder@github.com"
-          BRANCH="${{ github.event.inputs.FOX_BRANCH || 'fox_12.1' }}"
-          repo init --depth=1 -u https://gitlab.com/OrangeFox/manifest.git -b $BRANCH
-          repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j$(nproc --all)
+          git clone https://gitlab.com/OrangeFox/sync.git ~/OrangeFox_sync
+          cd ~/OrangeFox_sync
+          BRANCH="${{ github.event.inputs.FOX_BRANCH || '12.1' }}"
+          ./orangefox_sync.sh --branch $BRANCH --path $GITHUB_WORKSPACE/fox
 
       - name: Place Device Tree
         run: |
-          mkdir -p fox/device/infinix
-          cp -r device/infinix/X1201 fox/device/infinix/
+          mkdir -p $GITHUB_WORKSPACE/fox/device/infinix
+          cp -r device/infinix/X1201 $GITHUB_WORKSPACE/fox/device/infinix/
 
       - name: Build OrangeFox Vendor Boot Image
         run: |
-          cd fox
+          cd $GITHUB_WORKSPACE/fox
           source build/envsetup.sh
           export ALLOW_MISSING_DEPENDENCIES=true
           export FOX_BUILD_DEVICE=X1201
