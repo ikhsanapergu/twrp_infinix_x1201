@@ -69,6 +69,8 @@ jobs:
           source build/envsetup.sh
           export ALLOW_MISSING_DEPENDENCIES=true
           lunch twrp_X1201-eng || lunch omni_X1201-eng
+          # Fix AOSP core/Makefile rsync root/vendor conflict
+          sed -i 's/--exclude=cache/--exclude=cache --exclude=vendor/g' build/make/core/Makefile
           mka vendorbootimage -j$(nproc --all)
 
       - name: Upload TWRP Vendor Boot Artifact

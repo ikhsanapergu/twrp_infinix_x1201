@@ -65,13 +65,13 @@ jobs:
       - name: Build OrangeFox Vendor Boot Image
         run: |
           cd $GITHUB_WORKSPACE/fox
-          set +e
           source build/envsetup.sh
           export ALLOW_MISSING_DEPENDENCIES=true
           export FOX_BUILD_DEVICE=X1201
           export LC_ALL="C"
           lunch twrp_X1201-eng || lunch omni_X1201-eng || lunch fox_X1201-eng
-          set -e
+          # Fix AOSP core/Makefile rsync root/vendor conflict
+          sed -i 's/--exclude=cache/--exclude=cache --exclude=vendor/g' build/make/core/Makefile
           mka vendorbootimage -j$(nproc --all)
 
       - name: Upload OrangeFox Artifact
