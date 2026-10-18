@@ -11,6 +11,9 @@ on:
         options:
           - 'twrp-12.1'
           - 'twrp-11'
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -51,7 +54,8 @@ jobs:
           cd twrp
           git config --global user.name "Builder"
           git config --global user.email "builder@github.com"
-          repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b ${{ inputs.MANIFEST_BRANCH }}
+          BRANCH="${{ github.event.inputs.MANIFEST_BRANCH || 'twrp-12.1' }}"
+          repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b $BRANCH
           repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j$(nproc --all)
 
       - name: Place Device Tree

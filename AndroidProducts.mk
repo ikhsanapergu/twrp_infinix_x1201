@@ -15,8 +15,11 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/twrp_X1201.mk
+    $(LOCAL_DIR)/twrp_X1201.mk \
+    $(LOCAL_DIR)/omni_X1201.mk
 
 COMMON_LUNCH_CHOICES := \
     twrp_X1201-eng \
-    twrp_X1201-userdebug
+    twrp_X1201-userdebug \
+    omni_X1201-eng \
+    omni_X1201-userdebug
