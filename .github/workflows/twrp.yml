@@ -66,6 +66,10 @@ jobs:
       - name: Build TWRP Vendor Boot Image
         run: |
           cd twrp
+          # Fix mkbootimg: Android 12 header v4 requires support for --ramdisk_type and --vendor_ramdisk_fragment
+          curl -sSL https://raw.githubusercontent.com/LineageOS/android_system_tools_mkbootimg/lineage-19.1/mkbootimg.py > system/tools/mkbootimg/mkbootimg.py
+          curl -sSL https://raw.githubusercontent.com/LineageOS/android_system_tools_mkbootimg/lineage-19.1/unpack_bootimg.py > system/tools/mkbootimg/unpack_bootimg.py
+          curl -sSL https://raw.githubusercontent.com/LineageOS/android_system_tools_mkbootimg/lineage-19.1/repack_bootimg.py > system/tools/mkbootimg/repack_bootimg.py
           source build/envsetup.sh
           export ALLOW_MISSING_DEPENDENCIES=true
           lunch twrp_X1201-eng || lunch omni_X1201-eng
@@ -80,3 +84,4 @@ jobs:
           path: |
             twrp/out/target/product/X1201/vendor_boot.img
             twrp/out/target/product/X1201/ramdisk-recovery.cpio*
+            twrp/out/target/product/X1201/obj/PACKAGING/vendor_ramdisk_fragments_intermediates/recovery.cpio.gz
