@@ -66,9 +66,12 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/fox
           # Fix mkbootimg: Android 12 header v4 requires support for --ramdisk_type and --vendor_ramdisk_fragment
+          mkdir -p system/tools/mkbootimg
           curl -sSL https://raw.githubusercontent.com/LineageOS/android_system_tools_mkbootimg/lineage-19.1/mkbootimg.py > system/tools/mkbootimg/mkbootimg.py
           curl -sSL https://raw.githubusercontent.com/LineageOS/android_system_tools_mkbootimg/lineage-19.1/unpack_bootimg.py > system/tools/mkbootimg/unpack_bootimg.py
           curl -sSL https://raw.githubusercontent.com/LineageOS/android_system_tools_mkbootimg/lineage-19.1/repack_bootimg.py > system/tools/mkbootimg/repack_bootimg.py
+          # Patch mkbootimg.py so header v4 vendor_ramdisk_fragment is parsed even if --header_version is omitted by makefile
+          python3 -c 'p="system/tools/mkbootimg/mkbootimg.py"; s=open(p).read(); open(p,"w").write(s.replace("if args.vendor_boot is not None and args.header_version > 3:", "if args.vendor_boot is not None and (args.header_version > 3 or \"--vendor_ramdisk_fragment\" in extra_args):\n        if args.header_version < 4: args.header_version = 4"))'
           source build/envsetup.sh
           export ALLOW_MISSING_DEPENDENCIES=true
           export FOX_BUILD_DEVICE=X1201
