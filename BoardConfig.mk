@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2026 The Team Win Recovery Project
+# Copyright (C) 2026 The Team Win Recovery Project & OrangeFox Recovery Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -119,5 +119,23 @@ TW_NO_REBOOT_BOOTLOADER := true
 TW_HAS_EDL_MODE := false
 TW_NO_FASTBOOT_BOOT := true
 
-# Decryption (Disabled initially for clean first boot; requires format data in TWRP)
+# Decryption
 TW_INCLUDE_CRYPTO := false
+
+# --------------------------------------------------------------------------
+# OrangeFox Recovery Project (OFRP) Configuration
+# --------------------------------------------------------------------------
+OF_MAINTAINER := ikhsanapergu
+FOX_BUILD_TYPE := Unofficial
+OF_SCREEN_H := 2000
+OF_STATUS_H := 80
+OF_STATUS_INDENT_LEFT := 48
+OF_STATUS_INDENT_RIGHT := 48
+OF_CLOCK_POS := 1
+OF_ALLOW_DISABLE_NAVBAR := 0
+OF_HIDE_NOTCH := 1
+OF_USE_GREEN_LED := 0
+OF_FLASHLIGHT_ENABLE := 0
+OF_TARGET_DEVICES := X1201,Infinix-X1201
+FOX_USE_TWRP_RECOVERY_IMAGE_BUILDER := 1
+FOX_VANILLA_BUILD := 1

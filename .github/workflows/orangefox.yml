@@ -1,0 +1,83 @@
+name: Build OrangeFox for Infinix XPAD 20 Pro (X1201)
+
+on:
+  workflow_dispatch:
+    inputs:
+      FOX_BRANCH:
+        description: 'OrangeFox Manifest Branch'
+        required: true
+        default: 'fox_12.1'
+        type: choice
+        options:
+          - 'fox_12.1'
+          - 'fox_11.0'
+  push:
+    paths:
+      - '.github/workflows/orangefox.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Device Tree
+        uses: actions/checkout@v4
+        with:
+          path: device/infinix/X1201
+
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune -a -f
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg \
+            gperf imagemagick lib32readline-dev lib32z1-dev libelf-dev liblz4-tool libncurses5 \
+            libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync \
+            schedtool squashfs-tools xsltproc zip zlib1g-dev python3 python-is-python3 aria2
+
+      - name: Setup Repo Tool
+        run: |
+          mkdir -p ~/bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+x ~/bin/repo
+          sudo ln -sf ~/bin/repo /usr/bin/repo
+
+      - name: Initialize OrangeFox Manifest
+        run: |
+          mkdir -p fox
+          cd fox
+          git config --global user.name "Builder"
+          git config --global user.email "builder@github.com"
+          BRANCH="${{ github.event.inputs.FOX_BRANCH || 'fox_12.1' }}"
+          repo init --depth=1 -u https://gitlab.com/OrangeFox/manifest.git -b $BRANCH
+          repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j$(nproc --all)
+
+      - name: Place Device Tree
+        run: |
+          mkdir -p fox/device/infinix
+          cp -r device/infinix/X1201 fox/device/infinix/
+
+      - name: Build OrangeFox Vendor Boot Image
+        run: |
+          cd fox
+          source build/envsetup.sh
+          export ALLOW_MISSING_DEPENDENCIES=true
+          export FOX_BUILD_DEVICE=X1201
+          export LC_ALL="C"
+          lunch twrp_X1201-eng || lunch fox_X1201-eng || lunch omni_X1201-eng
+          mka vendorbootimage -j$(nproc --all)
+
+      - name: Upload OrangeFox Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OrangeFox-X1201-vendor_boot
+          path: |
+            fox/out/target/product/X1201/vendor_boot.img
+            fox/out/target/product/X1201/OrangeFox-*.zip
+            fox/out/target/product/X1201/ramdisk-recovery.cpio*

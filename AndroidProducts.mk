@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2026 The Team Win Recovery Project
+# Copyright (C) 2026 The Team Win Recovery Project & OrangeFox Recovery Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,10 +16,13 @@
 
 PRODUCT_MAKEFILES := \
     $(LOCAL_DIR)/twrp_X1201.mk \
-    $(LOCAL_DIR)/omni_X1201.mk
+    $(LOCAL_DIR)/omni_X1201.mk \
+    $(LOCAL_DIR)/fox_X1201.mk
 
 COMMON_LUNCH_CHOICES := \
     twrp_X1201-eng \
     twrp_X1201-userdebug \
     omni_X1201-eng \
-    omni_X1201-userdebug
+    omni_X1201-userdebug \
+    fox_X1201-eng \
+    fox_X1201-userdebug
