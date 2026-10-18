@@ -1,0 +1,76 @@
+name: Build TWRP for Infinix XPAD 20 Pro (X1201)
+
+on:
+  workflow_dispatch:
+    inputs:
+      MANIFEST_BRANCH:
+        description: 'TWRP Manifest Branch'
+        required: true
+        default: 'twrp-12.1'
+        type: choice
+        options:
+          - 'twrp-12.1'
+          - 'twrp-11'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Device Tree
+        uses: actions/checkout@v4
+        with:
+          path: device/infinix/X1201
+
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune -a -f
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg \
+            gperf imagemagick lib32readline-dev lib32z1-dev libelf-dev liblz4-tool libncurses5 \
+            libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync \
+            schedtool squashfs-tools xsltproc zip zlib1g-dev python3 python-is-python3
+
+      - name: Setup Repo Tool
+        run: |
+          mkdir -p ~/bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+x ~/bin/repo
+          sudo ln -sf ~/bin/repo /usr/bin/repo
+
+      - name: Initialize TWRP Minimal Manifest
+        run: |
+          mkdir -p twrp
+          cd twrp
+          git config --global user.name "Builder"
+          git config --global user.email "builder@github.com"
+          repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b ${{ inputs.MANIFEST_BRANCH }}
+          repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j$(nproc --all)
+
+      - name: Place Device Tree
+        run: |
+          mkdir -p twrp/device/infinix
+          cp -r device/infinix/X1201 twrp/device/infinix/
+
+      - name: Build TWRP Vendor Boot Image
+        run: |
+          cd twrp
+          source build/envsetup.sh
+          export ALLOW_MISSING_DEPENDENCIES=true
+          lunch twrp_X1201-eng || lunch omni_X1201-eng
+          mka vendorbootimage -j$(nproc --all)
+
+      - name: Upload TWRP Vendor Boot Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TWRP-X1201-vendor_boot
+          path: |
+            twrp/out/target/product/X1201/vendor_boot.img
+            twrp/out/target/product/X1201/ramdisk-recovery.cpio*

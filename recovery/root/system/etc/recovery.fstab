@@ -1,0 +1,33 @@
+# Android fstab file for Infinix XPAD 20 Pro (X1201)
+# <src>                                                 <mnt_point>     <type>      <mnt_flags and options>                               <fs_mgr_flags>
+
+# Dynamic Partitions
+system                                                  /system         erofs       ro                                                    wait,slotselect,logical,first_stage_mount
+system                                                  /system         ext4        ro                                                    wait,slotselect,logical,first_stage_mount
+system_ext                                              /system_ext     erofs       ro                                                    wait,slotselect,logical,first_stage_mount
+system_ext                                              /system_ext     ext4        ro                                                    wait,slotselect,logical,first_stage_mount
+vendor                                                  /vendor         erofs       ro                                                    wait,slotselect,logical,first_stage_mount
+vendor                                                  /vendor         ext4        ro                                                    wait,slotselect,logical,first_stage_mount
+product                                                 /product        erofs       ro                                                    wait,slotselect,logical,first_stage_mount
+product                                                 /product        ext4        ro                                                    wait,slotselect,logical,first_stage_mount
+vendor_dlkm                                             /vendor_dlkm    erofs       ro                                                    wait,slotselect,logical,first_stage_mount
+vendor_dlkm                                             /vendor_dlkm    ext4        ro                                                    wait,slotselect,logical,first_stage_mount
+odm_dlkm                                                /odm_dlkm       ext4        ro                                                    wait,slotselect,logical,first_stage_mount
+
+# Physical Partitions
+/dev/block/by-name/metadata                             /metadata       ext4        noatime,nosuid,nodev,discard                          wait,check,formattable,first_stage_mount
+/dev/block/by-name/userdata                             /data           f2fs        noatime,nosuid,nodev,discard,noflush_merge            wait,check,formattable,latemount,resize
+/dev/block/by-name/tranfs                               /tranfs         ext4        noatime,nosuid,nodev,discard                          wait,check,formattable,nofail,first_stage_mount
+/dev/block/by-name/protect1                             /mnt/vendor/protect_f ext4  noatime,nosuid,nodev                                  wait,check,formattable
+/dev/block/by-name/protect2                             /mnt/vendor/protect_s ext4  noatime,nosuid,nodev                                  wait,check,formattable
+/dev/block/by-name/nvdata                               /mnt/vendor/nvdata ext4     noatime,nosuid,nodev                                  wait,check,formattable
+/dev/block/by-name/nvcfg                                /mnt/vendor/nvcfg  ext4     noatime,nosuid,nodev                                  wait,check,formattable
+/dev/block/by-name/persist                              /mnt/vendor/persist ext4   noatime,nosuid,nodev                                  wait,check,formattable
+
+# Core Boot & Vendor Boot
+/dev/block/by-name/boot                                 /boot           emmc        defaults                                              first_stage_mount,nofail,slotselect
+/dev/block/by-name/vendor_boot                          /vendor_boot    emmc        defaults                                              defaults
+/dev/block/by-name/dtbo                                 /dtbo           emmc        defaults                                              defaults
+/dev/block/by-name/vbmeta                               /vbmeta         emmc        defaults                                              defaults
+/dev/block/by-name/vbmeta_system                        /vbmeta_system  emmc        defaults                                              first_stage_mount,nofail,slotselect
+/dev/block/by-name/vbmeta_vendor                        /vbmeta_vendor  emmc        defaults                                              first_stage_mount,nofail,slotselect
