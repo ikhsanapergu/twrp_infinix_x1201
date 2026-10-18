@@ -18,12 +18,4 @@ LOCAL_PATH := $(call my-dir)
 
 ifeq ($(TARGET_DEVICE),X1201)
 include $(call all-subdir-makefiles,$(LOCAL_PATH))
-
-# Ensure prebuilt DTB is copied to PRODUCT_OUT for vendor_boot packaging
-INSTALLED_DTBIMAGE_TARGET := $(PRODUCT_OUT)/dtb.img
-$(INSTALLED_DTBIMAGE_TARGET): $(LOCAL_PATH)/prebuilt/dtb.img
-	$(hide) mkdir -p $(dir $@)
-	$(hide) cp -f $< $@
-
-ALL_DEFAULT_INSTALLED_MODULES += $(INSTALLED_DTBIMAGE_TARGET)
 endif
